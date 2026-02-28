@@ -1,0 +1,4 @@
+Model,Dependent Variable,Independent Variable,Coefficient,Std Error,P-value,R-squared,N
+Graduation ~ Disadvantage,Graduation Rate (%),Disadvantage Score,-1.4974017757177565,0.7090580801508753,0.03675889129108393,0.03554745869104936,123.0
+Enrollment ~ Disadvantage,College Enrollment Rate (%),Disadvantage Score,-2.399927709243835,0.7465216579287377,0.0016738857791647457,0.07869206427369135,123.0
+Transition Gap ~ Disadvantage,Transition Gap (%),Disadvantage Score,0.9025259335260785,0.5084606031543855,0.07840956778128184,0.025377898075445326,123.0
