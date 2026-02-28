@@ -4,13 +4,17 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import os
+import glob
 
 # ════════════════════════════════════════════════
 # PART 1: CPS Data Cleaning
 # ════════════════════════════════════════════════
 
 # ── load in data─────────────────────────────────
-df_cps = pd.read_csv("CPS_data.csv")
+# Look for CPS data file in data/raw-data directory
+cps_file_path = "../data/raw-data/CPS_data.csv"
+df_cps = pd.read_csv(cps_file_path)
 
 for col in df_cps.columns:
     print(col)
@@ -30,7 +34,13 @@ df_hs["Transition_Gap"] = df_hs["Graduation_4_Year_School_Pct_Year_2"] - df_hs["
 
 print(len(df_hs))
 
-df_hs.to_csv("CPS_clean_data.csv", index=False)
+# Save cleaned CPS data to derived-data directory
+derived_data_dir = "../data/derived-data"
+os.makedirs(derived_data_dir, exist_ok=True)
+
+cps_clean_path = os.path.join(derived_data_dir, "CPS_clean_data.csv")
+df_hs.to_csv(cps_clean_path, index=False)
+print(f"Saved cleaned CPS data to: {cps_clean_path}")
 
 # ════════════════════════════════════════════════
 # PART 2: ACS Data Download
@@ -114,8 +124,14 @@ n_before = len(df_clean)
 df_clean = df_clean.dropna()
 n_after = len(df_clean)
 
-df.to_csv("acs_raw_chicago.csv", index=False)
-df_clean.to_csv("acs_clean_chicago.csv", index=False)
+# Save ACS data to derived-data directory
+acs_raw_path = os.path.join(derived_data_dir, "acs_raw_chicago.csv")
+acs_clean_path = os.path.join(derived_data_dir, "acs_clean_chicago.csv")
+
+df.to_csv(acs_raw_path, index=False)
+df_clean.to_csv(acs_clean_path, index=False)
+print(f"Saved raw ACS data to: {acs_raw_path}")
+print(f"Saved cleaned ACS data to: {acs_clean_path}")
 
 print(f"\nDone!")
 print(f"Total Census Tracts: {n_before}")
@@ -130,8 +146,15 @@ print(df_clean.drop(columns=["GEOID", "NAME"]).describe().round(3))
 # ════════════════════════════════════════════════
 
 # ── load in data─────────────────────────────────
-df_clean = pd.read_csv("acs_clean_chicago.csv")
-df_raw   = pd.read_csv("acs_raw_chicago.csv")
+# Load ACS data from derived-data directory
+acs_clean_path = os.path.join(derived_data_dir, "acs_clean_chicago.csv")
+acs_raw_path = os.path.join(derived_data_dir, "acs_raw_chicago.csv")
+
+print(f"Loading ACS cleaned data from: {acs_clean_path}")
+print(f"Loading ACS raw data from: {acs_raw_path}")
+
+df_clean = pd.read_csv(acs_clean_path)
+df_raw   = pd.read_csv(acs_raw_path)
 
 df_clean["GEOID"] = df_clean["GEOID"].astype(str)
 df_raw["GEOID"]   = df_raw["GEOID"].astype(str)
@@ -173,9 +196,12 @@ plt.ylabel("Variance Explained", fontsize=12)
 plt.xticks(range(1, len(pca_vars) + 1))
 plt.grid(axis="y", linestyle="--", alpha=0.5)
 plt.tight_layout()
-plt.savefig("scree_plot.png", dpi=150)
+# Save scree plot to derived-data directory
+scree_plot_path = os.path.join(derived_data_dir, "scree_plot.png")
+plt.savefig(scree_plot_path, dpi=150)
+print(f"Scree plot saved to: {scree_plot_path}")
 plt.show()
-print("Scree plot saved to scree_plot.png")
+
 
 print("\n=== Factor Loadings for PC1 ===")
 loadings = pd.Series(pca.components_[0], index=pca_vars)
@@ -199,5 +225,7 @@ print("\n=== Top 10 Least Disadvantaged Tracts ===")
 print(df_clean[["GEOID", "NAME", "disadvantage_score"]].sort_values(
     "disadvantage_score", ascending=True).head(10).to_string(index=False))
 
-df_clean.drop(columns=["population"]).to_csv("acs_with_pca_score.csv", index=False)
-print("\nResults saved to acs_with_pca_score.csv")
+# Save PCA results to derived-data directory
+acs_pca_path = os.path.join(derived_data_dir, "acs_with_pca_score.csv")
+df_clean.drop(columns=["population"]).to_csv(acs_pca_path, index=False)
+print(f"\nResults saved to: {acs_pca_path}")
