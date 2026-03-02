@@ -6,14 +6,17 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import os
 import glob
-
+from pathlib import Path
 # ════════════════════════════════════════════════
 # PART 1: CPS Data Cleaning
 # ════════════════════════════════════════════════
 
 # ── load in data─────────────────────────────────
 # Look for CPS data file in data/raw-data directory
-cps_file_path = "../data/raw-data/CPS_data.csv"
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DERIVED_DATA_DIR = PROJECT_ROOT / "data" / "raw-data"
+cps_file_path = DERIVED_DATA_DIR / "CPS_data.csv"
 df_cps = pd.read_csv(cps_file_path)
 
 for col in df_cps.columns:
