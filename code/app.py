@@ -411,6 +411,18 @@ def main():
             # Create Folium map
             m = folium.Map(location=[41.8781, -87.6298], zoom_start=10)
             
+            # Add tract boundaries as background for all map types
+            folium.GeoJson(
+                tracts_gdf,
+                name='Tract Boundaries',
+                style_function=lambda x: {
+                    'fillColor': 'transparent',
+                    'color': 'gray',
+                    'weight': 0.5,
+                    'fillOpacity': 0
+                }
+            ).add_to(m)
+            
             if map_type == "Neighborhood Disadvantage":
                 # Choropleth for neighborhood disadvantage
                 folium.Choropleth(
@@ -467,6 +479,75 @@ def main():
                             Graduation: {grad_rate:.1f}%<br>
                             College Enrollment: {row['College_Enrollment_School_Pct_Year_2']:.1f}%<br>
                             Transition Gap: {row['Transition_Gap']:.1f}%
+                            """
+                            folium.CircleMarker(
+                                location=[row['School_Latitude'], row['School_Longitude']],
+                                radius=8,
+                                color=color,
+                                fill=True,
+                                fill_color=color,
+                                fill_opacity=0.7,
+                                popup=folium.Popup(popup_text, max_width=300)
+                            ).add_to(m)
+            
+            elif map_type == "School College Enrollment":
+                # Color schools by college enrollment rate
+                for idx, row in schools_gdf.iterrows():
+                    if pd.notnull(row['School_Latitude']) and pd.notnull(row['School_Longitude']):
+                        # Color based on college enrollment rate
+                        enroll_rate = row['College_Enrollment_School_Pct_Year_2']
+                        if pd.notnull(enroll_rate):
+                            if enroll_rate >= 80:
+                                color = 'green'
+                            elif enroll_rate >= 60:
+                                color = 'lightgreen'
+                            elif enroll_rate >= 40:
+                                color = 'yellow'
+                            elif enroll_rate >= 20:
+                                color = 'orange'
+                            else:
+                                color = 'red'
+                            
+                            popup_text = f"""
+                            <b>{row['Long_Name']}</b><br>
+                            Graduation: {row['Graduation_4_Year_School_Pct_Year_2']:.1f}%<br>
+                            College Enrollment: {enroll_rate:.1f}%<br>
+                            Transition Gap: {row['Transition_Gap']:.1f}%
+                            """
+                            folium.CircleMarker(
+                                location=[row['School_Latitude'], row['School_Longitude']],
+                                radius=8,
+                                color=color,
+                                fill=True,
+                                fill_color=color,
+                                fill_opacity=0.7,
+                                popup=folium.Popup(popup_text, max_width=300)
+                            ).add_to(m)
+            
+            elif map_type == "School Transition Gaps":
+                # Color schools by transition gap
+                for idx, row in schools_gdf.iterrows():
+                    if pd.notnull(row['School_Latitude']) and pd.notnull(row['School_Longitude']):
+                        # Color based on transition gap
+                        gap = row['Transition_Gap']
+                        if pd.notnull(gap):
+                            # For gap, lower is better (smaller gap)
+                            if gap <= 10:
+                                color = 'green'
+                            elif gap <= 20:
+                                color = 'lightgreen'
+                            elif gap <= 30:
+                                color = 'yellow'
+                            elif gap <= 40:
+                                color = 'orange'
+                            else:
+                                color = 'red'
+                            
+                            popup_text = f"""
+                            <b>{row['Long_Name']}</b><br>
+                            Graduation: {row['Graduation_4_Year_School_Pct_Year_2']:.1f}%<br>
+                            College Enrollment: {row['College_Enrollment_School_Pct_Year_2']:.1f}%<br>
+                            Transition Gap: {gap:.1f}%
                             """
                             folium.CircleMarker(
                                 location=[row['School_Latitude'], row['School_Longitude']],
