@@ -47,7 +47,7 @@ print(f"Saved cleaned CPS data to: {cps_clean_path}")
 # ════════════════════════════════════════════════
 
 API_KEY  = "ef9b79a5ab62a54bb237c8b342a7bf5e5a1c502b"
-BASE_URL = "https://api.census.gov/data/2022/acs/acs5"
+BASE_URL = "https://api.census.gov/data/2024/acs/acs5"
 STATE    = "17"       # Illinois
 COUNTY   = "031"      # Cook County
 
